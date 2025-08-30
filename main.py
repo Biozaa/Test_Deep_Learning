@@ -7,7 +7,7 @@ X, y = make_blobs(n_samples=100, centers=2, random_state=0)
 # plt.scatter(X[:, 0], X[:, 1], c=y, cmap='summer')
 # plt.show()
 
-class NeuronComputation:
+class SingleNeuron:
 
     def __init__(self, X, y, n_iter = 100, alpha = 0.01):
 
@@ -21,28 +21,29 @@ class NeuronComputation:
 
             if i == 0:
 
-                self.W.append(self.initialisation(X)[0])
-                self.b.append(self.initialisation(X)[1])
+                self.W.append(self.initialize_params(X)[0])
+                self.b.append(self.initialize_params(X)[1])
 
-            self.Z.append(self.get_output(X, self.W[-1], self.b[-1]))
-            self.A.append(self.activation(self.Z[-1]))
+            self.Z.append(self.compute_output(X, self.W[-1], self.b[-1]))
+            self.A.append(self.compute_activation(self.Z[-1]))
 
             self.loss.append(self.compute_loss(y, self.A[-1]))
 
             self.W.append(self.update_params(self.W[-1], self.b[-1], X, y, self.A[-1], alpha)[0])
             self.b.append(self.update_params(self.W[-1], self.b[-1], X, y, self.A[-1], alpha)[1])
 
-    def initialisation(self, X):
+    def initialize_params(self, X):
 
         W = np.random.rand(X.shape[1])
         b = np.random.rand(1)
+        
         return W, b
 
-    def get_output(self, X, W, b):
+    def compute_output(self, X, W, b):
 
         return np.dot(X, W) + b
 
-    def activation(self, Z):
+    def compute_activation(self, Z):
 
         return 1 / (1 + np.exp(-Z))
 
@@ -59,10 +60,12 @@ class NeuronComputation:
         b -= alpha / m * np.sum(A - y)
         return W, b
 
-neuron = NeuronComputation(X, y, n_iter=1000)
+neuron = SingleNeuron(X, y, n_iter=100, alpha=0.5)
 plt.plot(neuron.loss)
+
 for i in range(X.shape[0]):
-    print("y :", y[i], " A : ", neuron.A[-1][i])
+    print("y :", y[i], " A : ", f'{neuron.A[-1][i]:.2f}')
+
 plt.xlabel('Iterations')
 plt.ylabel('Loss')
 plt.title('Loss over iterations')
